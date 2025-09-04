@@ -2,7 +2,7 @@ import pino from "pino";
 
 import {env} from "@/env";
 
-const isEdge = env.NEXT_RUNTIME === "edge";
+const isEdge = env.NEXT_RUNTIME === "nodejs";
 const isProduction = env.NODE_ENV === "production";
 
 export const logger = pino({

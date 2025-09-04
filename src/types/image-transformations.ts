@@ -102,7 +102,7 @@ export type Enhancements = {
     offsetY?: number; // y
   };
   background?: {
-    type: "solid" | "blurred" | "dominant";
+    type?: "solid" | "blurred" | "dominant";
     color?: string; // for solid
     blurIntensity?: number | "auto"; // for blurred
     brightness?: number; // -255 to 255
@@ -118,7 +118,7 @@ export type AiMagic = {
       prompt?: string;
       width?: number;
       height?: number;
-      cropMode: "pad_resize" | "pad_extract";
+      cropMode?: "pad_resize" | "pad_extract";
     };
   };
   editing?: {

@@ -76,9 +76,11 @@ function overlaysToParams(overlays: Overlay[]): string[] {
       if (o.backgroundColor) params.push(`bg-${o.backgroundColor}`);
       if (o.padding) params.push(`pa-${o.padding}`);
       if (o.align) params.push(`lfo-${o.align}`);
-      if (o.bold) params.push("b-true");
-      if (o.italic) params.push("i-true");
-      if (o.strike) params.push("s-true");
+      const tg: string[] = [];
+      if (o.bold) tg.push("b");
+      if (o.italic) tg.push("i");
+      if (o.strike) tg.push("strikethrough");
+      if (tg.length) params.push(`tg-${tg.join("_")}`);
       if (o.rotation !== undefined) params.push(`rt-${o.rotation}`);
       if (o.flip) params.push(`fl-${o.flip}`);
       params.push("l-end");
@@ -86,18 +88,16 @@ function overlaysToParams(overlays: Overlay[]): string[] {
     }
 
     if (o.type === "gradient") {
-      const params: string[] = ["l-image", "i-ik_canvas", "e-gradient"];
-      if (o.direction !== undefined) params.push(`ld-${o.direction}`);
-      if (o.fromColor) params.push(`from-${o.fromColor}`);
-      if (o.toColor) params.push(`to-${o.toColor}`);
+      const params: string[] = ["e-gradient"];
+      if (o.direction) params.push(`ld-${o.direction}`);
+      if (o.fromColor) params.push(`from-${o.fromColor.replace("#", "")}`);
+      if (o.toColor) params.push(`to-${o.toColor.replace("#", "")}`);
       if (o.stopPoint !== undefined) params.push(`sp-${o.stopPoint}`);
       if (o.width) params.push(`w-${o.width}`);
       if (o.height) params.push(`h-${o.height}`);
       if (o.radius) params.push(`r-${o.radius}`);
-      params.push("l-end");
       parts.push(params.join(","));
     }
-
     if (o.type === "solid") {
       const params: string[] = ["l-image", "i-ik_canvas"];
       if (o.color) params.push(`bg-${o.color}`);
@@ -157,23 +157,24 @@ function enhancementsToParams(enh: Enhancements): string[] {
   if (enh.sharpen) parts.push(`e-sharpen-${enh.sharpen}`);
   if (enh.shadow) {
     const s = enh.shadow;
-    const shadowParts: string[] = ["e-shadow"];
+    const shadowParts: string[] = [];
     if (s.blur !== undefined) shadowParts.push(`bl-${s.blur}`);
     if (s.saturation !== undefined) shadowParts.push(`st-${s.saturation}`);
     if (s.offsetX !== undefined) shadowParts.push(`x-${s.offsetX}`);
     if (s.offsetY !== undefined) shadowParts.push(`y-${s.offsetY}`);
-    parts.push(shadowParts.join("_"));
+    parts.push("e-shadow-".concat(shadowParts.join("_")));
   }
   if (enh.background) {
     const bg = enh.background;
-    if (bg.type === "solid" && bg.color) parts.push(`bg-${bg.color}`);
+    if (bg.type === "solid" && bg.color)
+      parts.push(`bg=${bg.color.replace("#", "").toUpperCase()}`);
     if (bg.type === "blurred") {
-      const val = ["bg-blurred"];
+      const val = ["bg=blurred"];
       if (bg.blurIntensity) val.push(`${bg.blurIntensity}`);
       if (bg.brightness) val.push(`${bg.brightness}`);
       parts.push(val.join("_"));
     }
-    if (bg.type === "dominant") parts.push("bg-dominant");
+    if (bg.type === "dominant") parts.push("bg=dominant");
   }
   return parts;
 }

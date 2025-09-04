@@ -1,7 +1,10 @@
 import {type SectionKey} from "@/components/studio/dock";
 import {TransformationConfig} from "@/types";
 
+import {AIMagicPanel} from "./ai-magic-panel";
+import {ImageEnhancementPanel} from "./enhancements-panel";
 import {ImageBasicsPanel} from "./image-basics-panel";
+import {OverlaysPanel} from "./overlays-and-effects";
 
 type TransformPanelProps = {
   activeSection: SectionKey;
@@ -33,27 +36,75 @@ export function TransformPanel({
 
   const renderPanelContent = () => {
     switch (activeSection) {
-      case "basics":
+      case "basics": {
         if (transforms.type === "IMAGE") {
           return (
             <ImageBasicsPanel
-              transforms={transforms.basics || {}}
+              transforms={transforms.basics ?? {}}
               onTransformChange={b =>
                 onTransformChange({...transforms, basics: b})
               }
             />
           );
-        } else if (transforms.type === "VIDEO") {
+        }
+        if (transforms.type === "VIDEO") {
           return <>Video Basics</>;
         }
-      case "overlays":
-        return <p>Overlays & Effects</p>;
-      case "enhancements":
-        return <p>Enhancements</p>;
-      case "ai":
-        return <p>AI Magic</p>;
+        break;
+      }
+
+      case "overlays": {
+        if (transforms.type === "IMAGE") {
+          return (
+            <OverlaysPanel
+              transforms={transforms.overlays ?? []}
+              onTransformChange={o =>
+                onTransformChange({...transforms, overlays: o})
+              }
+            />
+          );
+        }
+        if (transforms.type === "VIDEO") {
+          return <>Video Overlays</>;
+        }
+        break;
+      }
+
+      case "enhancements": {
+        if (transforms.type === "IMAGE") {
+          return (
+            <ImageEnhancementPanel
+              transforms={transforms.enhancements ?? {}}
+              onTransformChange={e =>
+                onTransformChange({...transforms, enhancements: e})
+              }
+            />
+          );
+        }
+        if (transforms.type === "VIDEO") {
+          return <>Video Enhancements</>;
+        }
+        break;
+      }
+
+      case "ai": {
+        if (transforms.type === "IMAGE") {
+          return (
+            <AIMagicPanel
+              transforms={transforms.ai ?? {}}
+              onTransformChange={ai => onTransformChange({...transforms, ai})}
+            />
+          );
+        }
+        if (transforms.type === "VIDEO") {
+          return <>Video AI Magic</>;
+        }
+        break;
+      }
+
       case "audio":
         return <p>Audio</p>;
+
       default:
         return (
           <div className="p-4 text-center text-gray-500">
