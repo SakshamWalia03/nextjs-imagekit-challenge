@@ -223,7 +223,6 @@ export function ImageEnhancementPanel({
             </AccordionContent>
           </AccordionItem>
 
-          {/* background */}
           {/* Background */}
           <AccordionItem value="background">
             <AccordionTrigger className="py-3 cursor-pointer">

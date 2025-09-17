@@ -123,7 +123,7 @@ export function OverlaysPanel({
         newOverlay = {
           id: uuid(),
           type: "image",
-          src: "https://via.placeholder.com/150",
+          src: "moments/df_DSENFB0ZS.png",
           width: 100,
           height: 100,
           x: 0,

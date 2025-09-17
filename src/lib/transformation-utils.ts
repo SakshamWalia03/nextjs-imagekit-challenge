@@ -179,38 +179,42 @@ function enhancementsToParams(enh: Enhancements): string[] {
   return parts;
 }
 
-function videoEnhancementsToParams(enh: VideoEnhancements): string[] {
-  const parts: string[] = [];
+function videoEnhancementsToParams(enh: VideoEnhancements): {
+  videoParts: string[];
+  thumbnailParts: string[];
+} {
+  const videoParts: string[] = [];
+  const thumbnailParts: string[] = [];
 
-  // trimming
+  // trimming (video only)
   if (enh.trimming) {
     const t = enh.trimming;
-    if (t.startOffset !== undefined) parts.push(`so-${t.startOffset}`);
-    if (t.endOffset !== undefined) parts.push(`eo-${t.endOffset}`);
-    if (t.duration !== undefined) parts.push(`du-${t.duration}`);
+    if (t.startOffset !== undefined) videoParts.push(`so-${t.startOffset}`);
+    if (t.endOffset !== undefined) videoParts.push(`eo-${t.endOffset}`);
+    if (t.duration !== undefined) videoParts.push(`du-${t.duration}`);
   }
 
-  // thumbnail transforms
+  // thumbnail (image only)
   if (enh.thumbnail) {
     const th = enh.thumbnail;
-    if (th.time !== undefined) parts.push(`so-${th.time}`);
-    if (th.width) parts.push(`w-${th.width}`);
-    if (th.height) parts.push(`h-${th.height}`);
-    if (th.aspectRatio) parts.push(`ar-${th.aspectRatio}`);
+    if (th.time !== undefined) thumbnailParts.push(`so-${th.time}`);
+    if (th.width) thumbnailParts.push(`w-${th.width}`);
+    if (th.height) thumbnailParts.push(`h-${th.height}`);
+    if (th.aspectRatio) thumbnailParts.push(`ar-${th.aspectRatio}`);
     if (th.cropMode) {
       if (["extract", "pad_resize"].includes(th.cropMode))
-        parts.push(`cm-${th.cropMode}`);
-      else parts.push(`c-${th.cropMode}`);
+        thumbnailParts.push(`cm-${th.cropMode}`);
+      else thumbnailParts.push(`c-${th.cropMode}`);
     }
-    if (th.focus) parts.push(`fo-${th.focus}`);
-    if (th.border) parts.push(`b-${th.border.width}_${th.border.color}`);
-    if (th.bg) parts.push(`bg-${th.bg}`);
-    if (th.radius !== undefined) parts.push(`r-${th.radius}`);
+    if (th.focus) thumbnailParts.push(`fo-${th.focus}`);
+    if (th.border)
+      thumbnailParts.push(`b-${th.border.width}-${th.border.color}`);
+    if (th.bg) thumbnailParts.push(`bg-${th.bg}`);
+    if (th.radius !== undefined) thumbnailParts.push(`r-${th.radius}`);
   }
 
-  return parts;
+  return {videoParts, thumbnailParts};
 }
-
 /* ---------------- AI MAGIC ---------------- */
 
 function aiToParams(ai: AiMagic): string[] {
@@ -295,8 +299,10 @@ export function buildTrString(config: TransformationConfig): string {
 
   if (config.type === "VIDEO") {
     if (config.basics) parts.push(...videoBasicsToParams(config.basics));
-    if (config.enhancements)
-      parts.push(...videoEnhancementsToParams(config.enhancements));
+    if (config.enhancements) {
+      const {videoParts} = videoEnhancementsToParams(config.enhancements);
+      parts.push(...videoParts);
+    }
     if (config.overlays) parts.push(...videoOverlaysToParams(config.overlays));
     if (config.audio) parts.push(...audioToParams(config.audio));
   }
@@ -309,16 +315,21 @@ export function buildImageKitUrl(
   config: TransformationConfig
 ): string {
   const tr = buildTrString(config);
+
+  if (config.type === "VIDEO" && config.enhancements?.thumbnail) {
+    const {thumbnailParts} = videoEnhancementsToParams(config.enhancements);
+    const trThumb = thumbnailParts.join(",");
+    return `${src}/ik-thumbnail.jpg?tr=${trThumb}`;
+  }
+
   if (!tr) return src;
 
   try {
     const url = new URL(src);
-
     const base = url.origin + url.pathname;
     const search = url.search
       ? `${url.search.replace(/^\?/, "")}&tr=${tr}`
       : `tr=${tr}`;
-
     return `${base}?${search}`;
   } catch {
     return src.includes("?") ? `${src}&tr=${tr}` : `${src}?tr=${tr}`;

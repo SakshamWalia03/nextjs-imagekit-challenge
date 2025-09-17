@@ -2,9 +2,13 @@ import {type SectionKey} from "@/components/studio/dock";
 import {TransformationConfig} from "@/types";
 
 import {AIMagicPanel} from "./ai-magic-panel";
+import {AudioPanel} from "./audio-panel";
 import {ImageEnhancementPanel} from "./enhancements-panel";
 import {ImageBasicsPanel} from "./image-basics-panel";
 import {OverlaysPanel} from "./overlays-and-effects";
+import {VideoBasicsPanel} from "./video-basics-panel";
+import {VideoEnhancementPanel} from "./video-enhancement-panel";
+import {VideoOverlaysPanel} from "./video-overlays-panel";
 
 type TransformPanelProps = {
   activeSection: SectionKey;
@@ -36,22 +40,30 @@ export function TransformPanel({
 
   const renderPanelContent = () => {
     switch (activeSection) {
-      case "basics": {
-        if (transforms.type === "IMAGE") {
-          return (
-            <ImageBasicsPanel
-              transforms={transforms.basics ?? {}}
-              onTransformChange={b =>
-                onTransformChange({...transforms, basics: b})
-              }
-            />
-          );
-        }
-        if (transforms.type === "VIDEO") {
-          return <>Video Basics</>;
+      case "basics":
+        {
+          if (transforms.type === "IMAGE") {
+            return (
+              <ImageBasicsPanel
+                transforms={transforms.basics ?? {}}
+                onTransformChange={b =>
+                  onTransformChange({...transforms, basics: b})
+                }
+              />
+            );
+          }
+          if (transforms.type === "VIDEO") {
+            return (
+              <VideoBasicsPanel
+                transforms={transforms.basics ?? {}}
+                onTransformChange={b =>
+                  onTransformChange({...transforms, basics: b})
+                }
+              />
+            );
+          }
         }
         break;
-      }
 
       case "overlays": {
         if (transforms.type === "IMAGE") {
@@ -65,7 +77,14 @@ export function TransformPanel({
           );
         }
         if (transforms.type === "VIDEO") {
-          return <>Video Overlays</>;
+          return (
+            <VideoOverlaysPanel
+              transforms={transforms.overlays ?? []}
+              onTransformChange={o =>
+                onTransformChange({...transforms, overlays: o})
+              }
+            />
+          );
         }
         break;
       }
@@ -82,7 +101,14 @@ export function TransformPanel({
           );
         }
         if (transforms.type === "VIDEO") {
-          return <>Video Enhancements</>;
+          return (
+            <VideoEnhancementPanel
+              transforms={transforms.enhancements ?? {}}
+              onTransformChange={e =>
+                onTransformChange({...transforms, enhancements: e})
+              }
+            />
+          );
         }
         break;
       }
@@ -103,8 +129,14 @@ export function TransformPanel({
       }
 
       case "audio":
-        return <p>Audio</p>;
-
+        return (
+          <AudioPanel
+            transforms={transforms.audio ?? {}}
+            onTransformChange={audio =>
+              onTransformChange({...transforms, audio})
+            }
+          />
+        );
       default:
         return (
           <div className="p-4 text-center text-gray-500">
