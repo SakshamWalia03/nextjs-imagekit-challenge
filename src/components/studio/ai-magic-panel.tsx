@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import {Brain, Crop, Palette, PenLine, Zap} from "lucide-react";
 
 import {
